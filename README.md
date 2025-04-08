@@ -2,15 +2,16 @@
 
 1. `npm install`
     
-    If encountor error with Shadcn/ui, try this command:
+    If you encounter error with shadcn/ui, try this command:
     `npx shadcn@latest init`
 
 2. Edit the appwrite.js file
 
-File Path: src/app/appwrite.js
+    File Path: src/app/appwrite.js
 
-3.  Login Page Path: src/app/auth/login/page.js
-    Signup Page Path: src/app/auth/register/page.js
+3.  Login Page Path: src/app/auth/login/page.js <br>
+
+Signup Page Path: src/app/auth/register/page.js
 
 
 
