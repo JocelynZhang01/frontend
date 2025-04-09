@@ -1,6 +1,7 @@
 "use client";
+
 import { useState } from "react";
-import { account, ID } from "../../appwrite";
+import { account } from "../../appwrite";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,22 +16,33 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-    
+
     try {
-      const session = await account.createEmailPasswordSession(email, password);
-      setLoggedInUser(await account.get());
-    } catch (error) {
-      console.error("Login failed:", error);
-      setError(error.message || "Failed to login. Please check your credentials.");
+      // delette current session if exists
+      try {
+        await account.deleteSession("current");
+      } catch (deleteError) {
+        console.warn("No active session to delete or already deleted:", deleteError.message);
+      }
+
+      // create a new session
+      await account.createEmailPasswordSession(email, password);
+      const user = await account.get();
+      setLoggedInUser(user);
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError(err.message || "Failed to login. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Handle logout
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -58,7 +70,7 @@ const LoginPage = () => {
             )}
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button 
+            <Button
               variant="destructive"
               onClick={logout}
               disabled={isLoading}
@@ -122,8 +134,8 @@ const LoginPage = () => {
             </div>
 
             <div className="pt-2">
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 className="w-full"
                 type="submit"
                 disabled={isLoading}
@@ -140,116 +152,3 @@ const LoginPage = () => {
 
 export default LoginPage;
 
-
-
-
-
-
-
-
-
-/** "use client";
-import { useState } from "react";
-import { account, ID } from "../../appwrite";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-
-const LoginPage = () => {
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const login = async (email, password) => {
-    const session = await account.createEmailPasswordSession(email, password);
-    setLoggedInUser(await account.get());
-  };
-
-  const logout = async () => {
-    await account.deleteSession("current");
-    setLoggedInUser(null);
-  };
-
-  if (loggedInUser) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">Welcome!</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-center text-gray-600 mb-4">You are successfully logged in.</p>
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <Button 
-              variant="destructive"
-              onClick={logout}
-            >
-              Logout
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">Log in</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:text-blue-800">
-                  Forgot your password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="text-center text-sm my-2">
-              Don&apos;t have an account?&nbsp;&nbsp;<Link href="/auth/register" className="text-blue-600 hover:text-blue-800">Sign up</Link>
-            </div>
-
-            <div className="pt-2">
-              <Button 
-                variant="default" 
-                className="w-full"
-                onClick={() => login(email, password)}
-              >
-                Login
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-export default LoginPage;
-*/
